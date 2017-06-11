@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc reference="Hubot.MatrixCreateRoom" locale="">
+  <web>Hubot</web>
+  <name>MatrixCreateRoom</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1483225200000</creationDate>
+  <date>1483225200000</date>
+  <contentUpdateDate>1483225200000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{groovy}}
+import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.httpclient.auth.*;
+import groovy.json.*;
+
+jsonSlurper = new JsonSlurper()
+jsonbuilder = new JsonBuilder()
+
+
+def getConfig(propertyName, defaultValue) {
+  def propertyValue = xwiki.getDocument("xwiki:Hubot.HubotConfig").getValue(propertyName)
+  if (propertyValue==null || propertyValue=="") {
+     propertyValue = xwiki.getDocument("Hubot.HubotConfig").getValue(propertyName)
+  }
+  if (propertyValue==null || propertyValue=="") {
+     propertyValue = defaultValue
+  }
+  return propertyValue;
+}
+
+def HUBOT_URL= getConfig("hubotUrl", "") + "newchat/"
+def HUBOT_USERNAME= getConfig("hubotUsername", "")
+def HUBOT_PASSWORD= getConfig("hubotPassword", "")
+
+def createRoom(url, roomname) {
+ System.out.println("Hubot Creating room ${roomname} with ${url}");
+ def client = new HttpClient();
+ if (HUBOT_USERNAME!="") {
+   client.getParams().setAuthenticationPreemptive(true);
+   def defaultcreds = new UsernamePasswordCredentials(HUBOT_USERNAME, HUBOT_PASSWORD);
+   client.getState().setCredentials(AuthScope.ANY, defaultcreds);
+ }
+ def method = new PostMethod(url);
+ method.setRequestHeader("Content-type", "application/json");
+ def root = jsonbuilder{ "roomName" roomname };
+ def requestEntity = new StringRequestEntity(
+    jsonbuilder.toString(),
+    "application/json",
+    "UTF-8");
+ method.setRequestEntity(requestEntity); 
+ client.executeMethod(method);
+ def resp = method. getResponseBodyAsString();
+ return jsonSlurper.parseText(resp)
+}
+
+def room = ""
+if (request.createMatrixRoom &amp;&amp; request.page) {
+  def pageDoc = xwiki.getDocument(request.page)
+  def roomTitle = "XWiki page: ${pageDoc.getDisplayTitle()}"
+  def result = createRoom(HUBOT_URL, roomTitle)
+  room = result.room_id;
+  if (room!=null &amp;&amp; room!="") {
+    if (!pageDoc.getObject("Hubot.ChannelClass")) {
+      pageDoc.createNewObject("Hubot.ChannelClass");
+    }
+    pageDoc.use("Hubot.ChannelClass")
+    pageDoc.set("channel", room)
+    pageDoc.save("Adding chat channel to document")
+    if (request.xredirect) {
+      response.sendRedirect(request.xredirect);
+    }
+  }
+}
+
+{{/groovy}}
+
+{{velocity}}
+#if(!$request.createMatrixRoom || !$request.page)
+{{html clean=false}}
+&lt;form action=""&gt;
+Page: &lt;input type="text" name="page" value="$!{espacetool.xml($!request.page)}" class="suggestDocuments" size="40" /&gt;
+&lt;br /&gt;Create Matrix room: &lt;input type="checkbox" name="createMatrixRoom" value="1" CHECKED /&gt;
+&lt;br /&gt;&lt;input type="submit" name="submit" value="Go" /&gt;
+&lt;/form&gt;
+#end
+{{/html}}
+
+</content>
+</xwikidoc>

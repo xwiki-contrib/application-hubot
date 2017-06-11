@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc reference="Hubot.WebHome" locale="">
+  <web>Hubot</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>sandbox:Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1483225200000</creationDate>
+  <date>1483225200000</date>
+  <contentUpdateDate>1483225200000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Hubot XWiki Integration</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.DocumentSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <name>Hubot.WebHome</name>
+    <number>0</number>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>5761d049-dcb7-458c-82d5-6d3c3719ed23</guid>
+    <property>
+      <sheet/>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.GadgetClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>content</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>content</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <position>
+        <disabled>0</disabled>
+        <name>position</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>position</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </position>
+      <title>
+        <disabled>0</disabled>
+        <name>title</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>title</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </title>
+    </class>
+    <name>Hubot.WebHome</name>
+    <number>0</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>ba4a0a4c-925e-42f3-be8b-7ea68da214ed</guid>
+    <property>
+      <content>{{velocity}}
+#set ($extraParams = '')
+#if ($doc.space != 'Main')
+  #set ($escapedDocumentReference = $services.rendering.escape($services.model.serialize($doc.documentReference,
+    'default'), 'xwiki/2.1'))
+  #set ($extraParams = "root='document:$escapedDocumentReference'")
+#end
+{{documentTree showTranslations="false" showAttachments="false" $extraParams /}}
+{{/velocity}}</content>
+    </property>
+    <property>
+      <position>1,1</position>
+    </property>
+    <property>
+      <title>#if ($doc.space == 'Main')$services.localization.render('platform.dashboard.wiki.pages')#{else}$services.localization.render('platform.dashboard.space.documents', [$doc.plainTitle])#end</title>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.GadgetClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>content</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>content</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <position>
+        <disabled>0</disabled>
+        <name>position</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>position</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </position>
+      <title>
+        <disabled>0</disabled>
+        <name>title</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>title</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </title>
+    </class>
+    <name>Hubot.WebHome</name>
+    <number>1</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>f72f72ce-8365-4b71-8688-5c729929d5e4</guid>
+    <property>
+      <content>{{velocity}}
+#set($tagSpace = $NULL)
+#if ($doc.space != "Main")
+  #set($tagSpace = $services.rendering.escape($doc.space, 'xwiki/2.1'))
+#end
+
+{{tagcloud  space="$!tagSpace" /}}
+{{/velocity}}</content>
+    </property>
+    <property>
+      <position>1,2</position>
+    </property>
+    <property>
+      <title>$services.localization.render('platform.dashboard.space.tagcloud', [$doc.plainTitle])</title>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.GadgetClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>content</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>content</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <position>
+        <disabled>0</disabled>
+        <name>position</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>position</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </position>
+      <title>
+        <disabled>0</disabled>
+        <name>title</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>title</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </title>
+    </class>
+    <name>Hubot.WebHome</name>
+    <number>2</number>
+    <className>XWiki.GadgetClass</className>
+    <guid>419ffa4b-3832-4b6a-b807-e231a49e6867</guid>
+    <property>
+      <content>{{velocity}}
+#set($aSpace = $NULL)
+#if ($doc.space != "Main")
+  #set ($aSpace = $services.rendering.escape($doc.space, 'xwiki/2.1'))
+#end
+
+{{activity spaces="$!aSpace" /}}
+{{/velocity}}</content>
+    </property>
+    <property>
+      <position>2,1</position>
+    </property>
+    <property>
+      <title>#if ($doc.space != 'Main')$services.localization.render('platform.dashboard.space.activity', [$doc.plainTitle])#{else}$services.localization.render('platform.dashboard.wiki.activity')#end</title>
+    </property>
+  </object>
+  <content>
+This is the home of the XWiki Hubot Integration page, which allows to integrate XWiki with Matrix, Slack, IRC and other chat systems. For now the integration has been tested with Matrix.
+
+== Features available ==
+
+This application provides:
+
+* Notifications sent to chat channels (either a global channel, or a channel for a specific space or a specific page)
+* Search XWiki from the chatbot.
+* (Matrix only) Automatically display the chat interface and create chat channels for XWiki page 
+
+To send messages to a specific channel for a page or a space, edit the page or space in object mode (Edit Object in Advanced mode) and add the Hubot.ChannelClass to the page. Once you have added the object, you can edit the "channel" field and indicate the proper channel. For Matrix the channel is in the form "!someid:matrix.org". You can get this ID in your chat client when viewing channel information.
+
+== Installation ==
+
+To install and configure this application:
+
+1/ Install Hubot and create your chat bot
+2/ Add the XWiki Hubot Script attach:xwiki.coffee and start hubot with the proper environment variables and the proper adaptor
+3/ Install the XWiki Hubot Integration Application (in each wiki, if you are using multiple wikis)
+4/ Configure the XWiki Hubot Integration Application in the Main wiki
+5/ Add attach:docextra.vm to your Skin page (it can be XWiki.DefaultSkin if you have not changed it)
+
+== Hubot Environment Variable ==
+
+Here is the list of environment variables necessary:
+
+{{code}}
+export HUBOT_MATRIX_HOST_SERVER=https://matrix.org
+export HUBOT_MATRIX_PASSWORD=YOURMATRIXUSERPASSOWORD
+export XWIKI_USERNAME=YOURXWIKIUSER
+export XWIKI_PASSWORD=YOURXWIKIPASSWORD
+export HUBOT_LOG_LEVEL=debug
+export EXPRESS_PORT=8001
+./bin/hubot -a matrix
+{{/code}}
+
+</content>
+</xwikidoc>

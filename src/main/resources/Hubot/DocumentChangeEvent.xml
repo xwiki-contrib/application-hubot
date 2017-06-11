@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc reference="Hubot.DocumentChangeEvent" locale="">
+  <web>Hubot</web>
+  <name>DocumentChangeEvent</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1483225200000</creationDate>
+  <date>1483225200000</date>
+  <contentUpdateDate>1483225200000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Hubot Notification Event Listener</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.ComponentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <roleHint>
+        <disabled>0</disabled>
+        <name>roleHint</name>
+        <number>2</number>
+        <prettyName>Component Role Hint</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </roleHint>
+      <roleType>
+        <disabled>0</disabled>
+        <name>roleType</name>
+        <number>1</number>
+        <prettyName>Component Role Type</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </roleType>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>3</number>
+        <prettyName>Component Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <name>Hubot.DocumentChangeEvent</name>
+    <number>0</number>
+    <className>XWiki.ComponentClass</className>
+    <guid>16b5a08c-a86b-456a-9bbe-99a2dcc5f40c</guid>
+    <property>
+      <roleHint>hubot</roleHint>
+    </property>
+    <property>
+      <roleType>org.xwiki.observation.EventListener</roleType>
+    </property>
+    <property>
+      <scope>global</scope>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.ComponentMethodClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Method body code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Method name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Hubot.DocumentChangeEvent</name>
+    <number>0</number>
+    <className>XWiki.ComponentMethodClass</className>
+    <guid>78df084d-fc04-4235-b5ff-721cdc17b5ac</guid>
+    <property>
+      <code>{{groovy}}
+xcontext.method.output.value = "hubot"
+{{/groovy}}</code>
+    </property>
+    <property>
+      <name>getName</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.ComponentMethodClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Method body code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Method name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Hubot.DocumentChangeEvent</name>
+    <number>1</number>
+    <className>XWiki.ComponentMethodClass</className>
+    <guid>de921192-ba77-4ff9-af02-47a161d51a11</guid>
+    <property>
+      <code>{{groovy}}
+import org.xwiki.bridge.event.*
+
+xcontext.method.output.value = [new DocumentCreatedEvent(), new DocumentUpdatedEvent()]
+{{/groovy}}</code>
+    </property>
+    <property>
+      <name>getEvents</name>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.ComponentMethodClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Method body code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Method name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <name>Hubot.DocumentChangeEvent</name>
+    <number>2</number>
+    <className>XWiki.ComponentMethodClass</className>
+    <guid>12bcbade-1268-4909-9184-707581026757</guid>
+    <property>
+      <code>{{groovy}}
+import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.httpclient.auth.*;
+import groovy.json.*;
+import com.xpn.xwiki.web.Utils;
+import org.apache.velocity.VelocityContext;
+import org.xwiki.velocity.VelocityManager;
+import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
+
+def getConfig(propertyName, defaultValue) {
+  def propertyValue = xwiki.getDocument("xwiki:Hubot.HubotConfig").getValue(propertyName)
+  if (propertyValue==null || propertyValue=="") {
+     propertyValue = xwiki.getDocument("Hubot.HubotConfig").getValue(propertyName)
+  }
+  if (propertyValue==null || propertyValue=="") {
+     propertyValue = defaultValue
+  }
+  return propertyValue;
+}
+
+HUBOT_URL= getConfig("hubotUrl", "") + "notifications/"
+HUBOT_USERNAME= getConfig("hubotUsername", "")
+HUBOT_PASSWORD= getConfig("hubotPassword", "")
+DEFAULT_ROOM = getConfig("defaultRoom", "")
+
+
+System.out.println("Hubot listener start");
+
+def sendMessage(url, message) {
+ def jsonbuilder = new JsonBuilder()
+ System.out.println("Hubot Sending message ${message} to ${url}");
+ def client = new HttpClient();
+ if (HUBOT_USERNAME!="") {
+   client.getParams().setAuthenticationPreemptive(true);
+   def defaultcreds = new UsernamePasswordCredentials(HUBOT_USERNAME, HUBOT_PASSWORD);
+   client.getState().setCredentials(AuthScope.ANY, defaultcreds);
+ }
+ def method = new PostMethod(url);
+ method.setRequestHeader("Content-type", "application/json");
+ def root = jsonbuilder{ "msg" message };
+ def requestEntity = new StringRequestEntity(
+    jsonbuilder.toString(),
+    "application/json",
+    "UTF-8");
+ method.setRequestEntity(requestEntity); 
+ client.executeMethod(method);
+ def resp = method. getResponseBodyAsString();
+ return resp
+}
+
+def findChannels(xDoc) {
+  def list = new ArrayList();
+  def prefDoc = xwiki.getDocument("${xcontext.database}:XWiki.XWikiPreferences")
+  prefDoc.use("Hubot.ChannelClass");
+  def mainchannel = prefDoc.getValue("channel");
+  if (mainchannel!=null &amp;&amp; mainchannel != "") {
+     System.out.println("Found main channel: " + mainchannel)
+     list.add(mainchannel)
+  }
+  def currentDocs = new ArrayList();
+  currentDocs.add(xDoc);
+  def currentDoc = xDoc;
+  def counter = 0;
+  while (counter&lt;20) {
+   counter++;
+   currentDoc.use("Hubot.ChannelClass");
+   def channel = currentDoc.getValue("channel");
+   if (channel!=null &amp;&amp; channel != "" &amp;&amp; !list.contains(channel)) {
+     System.out.println("Found channel: " + channel)
+     list.add(channel)
+   }
+   def parent = currentDoc.getParentReference();
+   System.out.println("Parent: " + parent)
+   if (parent==null)
+     break;
+   def parentDoc = xwiki.getDocument(parent)
+   if (currentDocs.contains(parentDoc))
+     break;
+   currentDoc = parentDoc;
+  }
+  return list;
+}
+
+try {
+def docName = xcontext.method.input.get(1)
+def xDoc = xwiki.getDocument(xcontext.database + ":" + docName)
+def eventClassName = xcontext.method.input.get(0).getClass().getName();
+def eventName = "created";
+if (eventClassName == "org.xwiki.bridge.event.DocumentUpdatedEvent")
+ eventName = "modified"
+def commentText = xDoc.getComment();
+if (commentText.contains("Added comment")) {
+ eventName = "commentadded"
+}
+def author = xwiki.getUserName(xDoc.getAuthor(), false)
+def url = xDoc.getExternalURL();
+def message = ""
+
+if (eventName.equals("commentadded")) {
+  def comments = xDoc.getComments(false);
+  def lastComment = comments[0];
+  commentText = lastComment.getProperty('comment').getValue();
+  author = xwiki.getUserName(lastComment.getProperty('author').getValue(), false)
+  message = "Comment added to " + docName + " in wiki " + xcontext.database + " by " + author + ": \n" + commentText;
+} else {
+ message = "" + docName + " in wiki " + xcontext.database + " has been " + eventName + " by " + author + " (v" + xDoc.getVersion() + "): " + commentText + " " + url; 
+ xcontext.context.put("lastChangePageName",  docName)
+ def content = xwiki.getDocument("Hubot.LastChanges").getContent()
+ def name = "Hubot.LastChanges"
+ def velocityManager = Utils.getComponent(VelocityManager.class);
+ def filter = Utils.getComponent(VelocityMacroFilter.class, "indent");
+ def vcontext = velocityManager.getVelocityContext();
+ content = filter.before(content, vcontext);
+ def writer = new StringWriter();
+ velocityManager.getVelocityEngine().evaluate(vcontext, writer, name, content);
+ def changesText = writer.toString().trim();
+ message += "\n" + changesText;
+}
+
+// Send Message to Channel that will receive all messages
+if (DEFAULT_ROOM &amp;&amp; DEFAULT_ROOM!="") {
+ sendMessage(HUBOT_URL + DEFAULT_ROOM, message)
+}
+
+// Find channels in document hierarchy
+def list = findChannels(xDoc);
+for (channel in list) {
+ sendMessage(HUBOT_URL + channel, message)
+}
+} catch(e) {
+ System.out.println("Exception running hubot event " + e.getMessage());
+}
+System.out.println("Hubot listener end");
+{{/groovy}}</code>
+    </property>
+    <property>
+      <name>onEvent</name>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

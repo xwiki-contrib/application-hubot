@@ -1,0 +1,684 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc reference="Hubot.LastChanges" locale="">
+  <web>Hubot</web>
+  <name>LastChanges</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1483225200000</creationDate>
+  <date>1483225200000</date>
+  <contentUpdateDate>1483225200000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWiki Document Text Last Changes</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>#if(!$pageName)
+#set($pageName = $xcontext.lastChangePageName)
+#end
+#if(!$pageName)
+#set($pageName = $request.page)
+#end
+#if(!$pageName)
+ #set($pageName = "Sandbox.WebHome")
+#end
+#set($pageDoc = $xwiki.getDocument($pageName))
+#set($rev2 = $pageDoc.getVersion())
+#set($rev1 = $pageDoc.getPreviousVersion())
+#set($origdoc = $xwiki.getDocument($pageDoc, $rev1))
+#set($newdoc = $xwiki.getDocument($pageDoc, $rev2))
+##
+## Changes
+##
+## Make the heading level adjustable when including this template.
+#if (!$headingLevel)
+  #set ($headingLevel = 2)
+#end
+#macro (unifiedDiff $previous $next)
+    #foreach ($block in $services.diff.display.unified($previous, $next))
+## @@ -$mathtool.add($block.previousStart, 1),$block.previousSize
+##          +$mathtool.add($block.nextStart, 1),$block.nextSize @@
+      #foreach ($line in $block)
+       #set ($lineNumber = $line.index + 1)
+#if($line.added || $line.deleted)
+$lineNumber #unifiedDiffLine($line)
+
+#end
+      #end
+    #end
+#end
+
+#macro (displayPropertyDiff $propertyName $previousValue $newValue $_obfuscate)
+  #set ($previousValue = "$!previousValue")
+  #set ($newValue = "$!newValue")
+  #if (!$_obfuscate &amp;&amp; $previousValue != $newValue
+      &amp;&amp; $previousValue.replaceAll('\r\n', $util.getNewline()) == $newValue.replaceAll('\r\n', $util.getNewline()))
+    #set ($_obfuscate = 'web.history.changes.lineEndings')
+  #end
+    #if ($_obfuscate)
+        ## $services.icon.renderHTML('info')
+    #end
+  #if (!$_obfuscate)
+    $propertyName
+    #unifiedDiff($previousValue $newValue)
+  #end
+  #set ($_obfuscate = $NULL)
+#end
+
+#macro (maybeDisplayPropertyDiff $propertyName $previousValue $newValue $_obfuscate)
+  ## Test if the raw values are different.
+  #if ($previousValue != $newValue)
+    #displayPropertyDiff($propertyName $previousValue $newValue $_obfuscate)
+  #end
+#end
+
+#macro (displayXPropertyDiff $diff $propertyPrettyName)
+  #if (!$propertyPrettyName)
+    #set ($xclass = $xwiki.getDocument($diff.className).getxWikiClass())
+    #set ($propertyPrettyName = "$!xclass.get($diff.propName).translatedPrettyName")
+    #if ($propertyPrettyName == '')
+      #set ($propertyPrettyName = $diff.propName)
+    #end
+  #end
+  #set ($obfuscate = $NULL)
+  #if ($diff.propType == 'Password' || ($diff.propType == 'Email' &amp;&amp; $diff.className == 'XWiki.XWikiUsers'))
+    #set ($obfuscate = 'web.history.changes.privateInformation')
+  #end
+  #maybeDisplayPropertyDiff($propertyPrettyName $diff.prevValue $diff.newValue $obfuscate)
+  #set ($propertyPrettyName = $NULL)
+#end
+
+#macro (displayDocumentFieldsDiff $oldDoc $newDoc $metaDataDiff $tagsDiff)
+    #set ($documentReference = $oldDoc.documentReference)
+    #if (!$documentReference)
+      #set ($documentReference = $newDoc.documentReference)
+    #end
+      ##diffIcon('file-text' 'change')
+      ## $services.localization.render('web.history.changes.summary.documentProperties')
+        #foreach ($fieldDiff in $metaDataDiff)
+          #set ($fieldPrettyName = $services.localization.render("core.viewers.diff.metadata.$fieldDiff.field"))
+          #displayXPropertyDiff($fieldDiff $fieldPrettyName)
+        #end
+        #if ($tagsDiff)
+          #foreach ($propertyDiff in $tagsDiff)
+            #if ($propertyDiff.action != 'object-added' &amp;&amp; $propertyDiff.action != 'object-removed')
+              #displayXPropertyDiff($propertyDiff)
+            #end
+          #end
+        #end
+        #set ($contentLabel = $services.localization.render('web.history.changes.document.content'))
+        #maybeDisplayPropertyDiff($contentLabel $oldDoc.content $newDoc.content)
+#end
+
+#macro (getAttachmentTextContent $attachment $return)
+  #set ($content = $NULL)
+  #if ($attachment &amp;&amp; $attachment.filesize &lt; 50000)
+    #set ($mimeType = $attachment.mimeType)
+    #set ($textMimeTypes = ['text/', 'application/xml', 'application/javascript', 'application/ecmascript',
+      'application/json', 'application/x-sh', '+xml'])
+    #foreach ($textMimeType in $textMimeTypes)
+      #if ($mimeType == $textMimeType || $mimeType.startsWith($textMimeType) || $mimeType.endsWith($textMimeType))
+        #set ($content = $attachment.contentAsString)
+        #break
+      #end
+    #end
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $content)
+#end
+
+#macro (displayAttachmentDiff $attachmentDiff)
+    #set ($oldAttachment = $attachmentDiff.origAttachment)
+    #set ($newAttachment = $attachmentDiff.newAttachment)
+    ##
+    ## Author
+    ##
+    #set ($oldAuthor = $oldAttachment.author)
+    #set ($newAuthor = $newAttachment.author)
+    #set ($authorLabel = $services.localization.render('web.history.changes.attachment.author'))
+    #maybeDisplayPropertyDiff($authorLabel $oldAuthor $newAuthor)
+    ##
+    ## Size
+    ##
+    #set ($oldSize = '')
+    #if ($oldAttachment.filesize)
+      #set ($oldSize = "#dynamicsize($oldAttachment.filesize)")
+      #set ($oldSize = $oldSize.trim())
+    #end
+    #set ($newSize = '')
+    #if ($newAttachment.filesize)
+      #set ($newSize = "#dynamicsize($newAttachment.filesize)")
+      #set ($newSize = $newSize.trim())
+    #end
+    #if ($oldSize == $newSize)
+      ## Sometimes the change is too small to have an effect on the displaed value (e.g. you add one byte to a one MB
+      ## file). In this case fallback on the raw size values (in bytes).
+      #set ($oldSize = $oldAttachment.filesize)
+      #set ($newSize = $newAttachment.filesize)
+    #end
+    #set ($sizeLabel = $services.localization.render('web.history.changes.attachment.size'))
+    #maybeDisplayPropertyDiff($sizeLabel $oldSize $newSize)
+    ##
+    ## Content
+    ##
+    #getAttachmentTextContent($oldAttachment $oldContent)
+    #getAttachmentTextContent($newAttachment $newContent)
+    #set ($obfuscate = $NULL)
+    #if (($oldAttachment &amp;&amp; !$oldContent) || ($newAttachment &amp;&amp; !$newContent))
+      #set ($obfuscate = 'web.history.changes.attachment.noContentChanges')
+    #end
+    #if (!$oldContent &amp;&amp; !$newContent)
+      ## Force the display of the diff header.
+      #set ($newContent = '')
+    #end
+    #set ($contentLabel = $services.localization.render('web.history.changes.attachment.content'))
+    #maybeDisplayPropertyDiff($contentLabel $oldContent $newContent $obfuscate)
+#end
+
+#macro (displayAttachmentDiffs $attachmentDiffs)
+    #foreach ($attachmentDiff in $attachmentDiffs)
+      #set ($ownerDocument = $attachmentDiff.origAttachment.document)
+      #if (!$ownerDocument)
+        #set ($ownerDocument = $attachmentDiff.newAttachment.document)
+      #end
+      #set ($attachmentReference = $services.model.createAttachmentReference($ownerDocument.documentReference,
+        $attachmentDiff.fileName))
+        #diffIcon('attach' $attachmentDiff.type)
+        $attachmentDiff.fileName
+      #displayAttachmentDiff($attachmentDiff)
+    #end
+#end
+
+#macro (displayObjectDiff $objectDiff)
+    #foreach ($propertyDiff in $objectDiff)
+      #if ($propertyDiff.action != 'object-added' &amp;&amp; $propertyDiff.action != 'object-removed')
+        #displayXPropertyDiff($propertyDiff)
+      #end
+    #end
+#end
+
+#macro (displayObjectDiffs $ownerDocumentReference $objectDiffs)
+    #foreach ($objectDiff in $objectDiffs)
+      #set ($_objectDiff = $objectDiff.get(0))
+      #set ($objectName = "${_objectDiff.className}[$_objectDiff.number]")
+      #set ($objectReference = $services.model.createEntityReference($objectName, 'OBJECT', $ownerDocumentReference))
+        #set ($action = $stringtool.removeStart($_objectDiff.action, 'object-'))
+        ##diffIcon('cubes', $action) $objectName
+      #displayObjectDiff($objectDiff)
+    #end
+#end
+
+#macro (displayClassDiff $oldClass $newClass $classDiff)
+    #set ($className = $oldClass.name)
+    #if ("$!className" == '')
+      #set ($className = $newClass.name)
+    #end
+    #foreach ($propertyDiff in $classDiff)
+      #set ($classReference = $services.model.resolveDocument($className))
+      #set ($classPropertyReference = $services.model.createEntityReference($propertyDiff.propName, 'CLASS_PROPERTY',
+        $classReference))
+        #diffIcon('cube' $propertyDiff.action)
+        $propertyDiff.propName
+      ## Unfortunately the class property diff doesn't tell us much except for the action.
+      #set ($oldProperty = $oldClass.get($propertyDiff.propName))
+      #set ($newProperty = $newClass.get($propertyDiff.propName))
+      #displayClassPropertyDiff($oldProperty $newProperty)
+    #end
+#end
+
+#macro (displayClassPropertyDiff $oldProperty $newProperty)
+  ## These meta-properties are not fully implemented, or almost never used.
+  #set ($hiddenMetaProperties = ['tooltip', 'unmodifiable', 'contenttype', 'disabled'])
+    ## Show the meta properties that have been modified or removed.
+    #foreach ($oldMetaProperty in $oldProperty.getProperties())
+      #if (!$hiddenMetaProperties.contains($oldMetaProperty.name))
+        #set ($newMetaProperty = $newProperty.getProperty($oldMetaProperty.name))
+        #set ($prettyName = $oldProperty.xWikiClass.get($oldMetaProperty.name).translatedPrettyName)
+        ## Show the diff between the string values (considering the empty string is the same as NULL).
+        #maybeDisplayPropertyDiff($prettyName "$!oldMetaProperty.value" "$!newMetaProperty.value")
+      #end
+    #end
+    ## Show the meta properties that have been added.
+    #foreach ($newMetaProperty in $newProperty.getProperties())
+      #set ($oldMetaProperty = $oldProperty.getProperty($newMetaProperty.name))
+      #if (!$oldMetaProperty &amp;&amp; !$hiddenMetaProperties.contains($newMetaProperty.name))
+        #set ($prettyName = $newProperty.xWikiClass.get($newMetaProperty.name).translatedPrettyName)
+        #maybeDisplayPropertyDiff($prettyName '' "$!newMetaProperty.value")
+      #end
+    #end
+#end
+
+#macro (createDocumentDiff $oldDoc $newDoc $return)
+  #set ($objectDiffs = [])
+  #set ($tagsDiff = $NULL)
+  #foreach ($objectDiff in $doc.getObjectDiff($oldDoc, $newDoc))
+    #if ($objectDiff.get(0).className == 'XWiki.TagClass')
+      #set ($tagsDiff = $objectDiff)
+    #else
+      #set ($discard = $objectDiffs.add($objectDiff))
+    #end
+  #end
+  #set ($classDiff = $doc.getClassDiff($oldDoc, $newDoc))
+  #if ($classDiff &amp;&amp; $classDiff.size() &gt; 0)
+    #set ($classDiff = $classDiff.get(0))
+  #end
+  #set ($documentReference = $oldDoc.documentReference)
+  #if (!$documentReference)
+    #set ($documentReference = $newDoc.documentReference)
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" {
+    'documentReference': $documentReference,
+    'oldDoc': $oldDoc,
+    'newDoc': $newDoc,
+    'metaData': $doc.getMetaDataDiff($oldDoc, $newDoc),
+    'tags': $tagsDiff,
+    'attachments': $doc.getAttachmentDiff($oldDoc, $newDoc),
+    'objects': $objectDiffs,
+    'classProperties': $classDiff
+  })
+#end
+
+#macro (displayDocumentDiff $docDiff)
+  ##
+  ## Document properties: title, content, tags, author, language...
+  ##
+  #set ($hasContentChanges = $docDiff.oldDoc &amp;&amp; $docDiff.newDoc &amp;&amp; $docDiff.oldDoc.content != $docDiff.newDoc.content)
+  #if ($docDiff.metaData.size() &gt; 0 || $docDiff.tags || $hasContentChanges)
+    #displayDocumentFieldsDiff($docDiff.oldDoc $docDiff.newDoc $docDiff.metaData $docDiff.tags)
+  #end
+  ##
+  ## Attachment changes
+  ##
+  #if ($docDiff.attachments.size() &gt; 0)
+    #displayAttachmentDiffs($docDiff.attachments)
+  #end
+  ##
+  ## Object changes
+  ##
+  #if ($docDiff.objects.size() &gt; 0)
+    #displayObjectDiffs($docDiff.newDoc.documentReference $docDiff.objects)
+  #end
+  ##
+  ## Class changes
+  ##
+  #if ($docDiff.classProperties.size() &gt; 0)
+    #set ($oldClass = $docDiff.oldDoc.getxWikiClass())
+    #set ($newClass = $docDiff.newDoc.getxWikiClass())
+    #displayClassDiff($oldClass $newClass $docDiff.classProperties)
+  #end
+#end
+
+#macro (createDocumentDiffSummary $docDiff $return)
+  #set ($entries = [])
+  #addDocumentPropertiesDiffSummary($docDiff $entries)
+  #addAttachmentsDiffSummary($docDiff $entries)
+  #addObjectsDiffSummary($docDiff $entries)
+  #addClassPropertiesDiffSummary($docDiff $entries)
+  #set ($return = $NULL)
+  #setVariable("$return" {
+    'documentReference': $docDiff.documentReference,
+    'entries': $entries
+  })
+#end
+
+#macro (addDocumentPropertiesDiffSummary $docDiff $entries)
+  #set ($documentPropertiesSummary = {
+    'icon': 'file-text',
+    'name': 'web.history.changes.summary.documentProperties',
+    'modified': $docDiff.metaData.size(),
+    'added': 0,
+    'removed': 0
+  })
+  #if ($docDiff.tags)
+    #set ($documentPropertiesSummary.modified = $documentPropertiesSummary.modified + 1)
+  #end
+  #if ($docDiff.oldDoc &amp;&amp; $docDiff.newDoc &amp;&amp; $docDiff.oldDoc.content != $docDiff.newDoc.content)
+    #set ($documentPropertiesSummary.modified = $documentPropertiesSummary.modified + 1)
+  #end
+  #if ($documentPropertiesSummary.modified &gt; 0)
+    #set ($discard = $entries.add($documentPropertiesSummary))
+  #end
+#end
+
+#macro (addAttachmentsDiffSummary $docDiff $entries)
+  #set ($attachmentsSummary = {
+    'icon': 'attach',
+    'name': 'web.history.changes.summary.attachments',
+    'modified': 0,
+    'added': 0,
+    'removed': 0,
+    'details': []
+  })
+  #foreach ($attachmentDiff in $docDiff.attachments)
+    #set ($action = $attachmentDiff.type)
+    #if ($action == 'change')
+      #set ($attachmentsSummary.modified = $attachmentsSummary.modified + 1)
+    #elseif ($action == 'insert')
+      #set ($attachmentsSummary.added = $attachmentsSummary.added + 1)
+    #else
+      #set ($attachmentsSummary.removed = $attachmentsSummary.removed + 1)
+    #end
+    #set ($discard = $attachmentsSummary.details.add({
+      'action': $action,
+      'reference': $services.model.createAttachmentReference($docDiff.documentReference, $attachmentDiff.fileName)
+    }))
+  #end
+  #if ($attachmentsSummary.details.size() &gt; 0)
+    #set ($discard = $entries.add($attachmentsSummary))
+  #end
+#end
+
+#macro (addObjectsDiffSummary $docDiff $entries)
+  #set ($objectsSummary = {
+    'icon': 'cubes',
+    'name': 'web.history.changes.summary.objects',
+    'modified': 0,
+    'added': 0,
+    'removed': 0,
+    'details': []
+  })
+  #foreach ($objectDiff in $docDiff.objects)
+    #set ($_objectDiff = $objectDiff.get(0))
+    #set ($action = $stringtool.removeStart($_objectDiff.action, 'object-'))
+    #if ($action == 'added')
+      #set ($objectsSummary.added = $objectsSummary.added + 1)
+    #elseif ($action == 'removed')
+      #set ($objectsSummary.removed = $objectsSummary.removed + 1)
+    #else
+      #set ($objectsSummary.modified = $objectsSummary.modified + 1)
+    #end
+    #set ($objectName = "${_objectDiff.className}[$_objectDiff.number]")
+    #set ($discard = $objectsSummary.details.add({
+      'action': $action,
+      'reference': $services.model.createEntityReference($objectName, 'OBJECT', $docDiff.documentReference)
+    }))
+  #end
+  #if ($objectsSummary.details.size() &gt; 0)
+    #set ($discard = $entries.add($objectsSummary))
+  #end
+#end
+
+#macro (addClassPropertiesDiffSummary $docDiff $entries)
+  #set ($classPropertiesSummary = {
+    'icon': 'cube',
+    'name': 'web.history.changes.summary.classProperties',
+    'modified': 0,
+    'added': 0,
+    'removed': 0,
+    'details': []
+  })
+  #foreach ($propertyDiff in $docDiff.classProperties)
+    #if ($propertyDiff.action == 'added')
+      #set ($classPropertiesSummary.added = $classPropertiesSummary.added + 1)
+    #elseif ($propertyDiff.action == 'removed')
+      #set ($classPropertiesSummary.removed = $classPropertiesSummary.removed + 1)
+    #else
+      #set ($classPropertiesSummary.modified = $classPropertiesSummary.modified + 1)
+    #end
+    #set ($discard = $classPropertiesSummary.details.add({
+      'action': $propertyDiff.action,
+      'reference': $services.model.createEntityReference($propertyDiff.propName, 'CLASS_PROPERTY',
+        $docDiff.documentReference)
+    }))
+  #end
+  #if ($classPropertiesSummary.details.size() &gt; 0)
+    #set ($discard = $entries.add($classPropertiesSummary))
+  #end
+#end
+
+##
+## New macros used to display differences, in unified format, between two versions of an XWiki entity.
+##
+
+##
+## Helpers
+##
+
+#macro (unifiedDiffLine $line)
+#if($line.type.symbol == ' ') #else$line.type.symbol#end##
+#if ($line.chunks)##
+#inlineDiffLine($line.chunks)##
+#else##
+$line.value##
+#end
+#end
+
+#macro (inlineDiffLine $chunks)
+#foreach ($chunk in $chunks)
+#set ($escapedChunk = $chunk)
+#if ($chunk.added)##
++${escapedChunk}+##
+#elseif ($chunk.deleted)##
+-${escapedChunk}-##
+#else##
+${escapedChunk}##
+#end
+#end
+#end
+
+#macro (diffIcon $icon $action)
+#*
+  #set ($_action = "$!action")
+  #set ($_action = $_action.toLowerCase())
+  #set ($aliases = {
+    'added': 'insert',
+    'removed': 'delete',
+    'changed': 'change',
+    '': 'change'
+  })
+  #if ($aliases.containsKey($_action))
+    #set ($_action = $aliases.get($_action))
+  #end
+    $services.icon.renderHTML($icon)
+*#
+#end
+
+#macro (diffAnchor $entityReference)
+#set ($id = "$!entityReference.type:$!services.model.serialize($entityReference, 'default')")
+#if ($entityReference.type == 'DOCUMENT')
+## We need different anchors for different document translations.
+#set ($id = "${id}_$!entityReference.locale")
+#end
+diff$id.hashCode()##
+#end
+
+#macro (diffVersion $version)
+#if ($version.id &amp;&amp; $version.version)
+## Seems to be an extension id.
+#set ($macro.extension = $services.extension.local.repository.resolve($version))
+#if ($macro.extension)$macro.extension.name#else$version.id#end ${version.version}##
+#else
+$!version##
+#end
+#end
+
+#macro (displayDocumentUnifiedDiffsWithSummary $documentDiffs $headingLevel)
+  #displayDocumentUnifiedDiffsSummary($documentDiffs)
+  #if ($documentDiffs.size() &gt; 0)
+    #displayDocumentUnifiedDiffs($documentDiffs)
+  #end
+#end
+
+##
+## Summary
+##
+
+#macro (displayDocumentUnifiedDiffsSummary $documentDiffs)
+  #if ($documentDiffs.isEmpty())
+    #info($services.localization.render('web.history.changes.noChanges'))
+  #else
+    #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
+    #set ($discard = $xwiki.jsfx.use('uicomponents/viewers/diff.js'))
+      $services.icon.renderHTML('branch')
+      $services.localization.render('web.history.changes.summary.documents',
+        ['&lt;a href="#details"&gt;', $documentDiffs.size(), '&lt;/a&gt;'])
+        #set ($count = {'change': 0, 'insert': 0, 'delete': 0})
+        #countEntityUnifiedDiffsChanges($documentDiffs $count)
+        ($services.localization.render('web.history.changes.summary.modifiedAddedRemoved',
+          [$count.change, $count.insert, $count.delete]))
+      #foreach ($documentDiff in $documentDiffs)
+        * #displayDocumentUnifiedDiffSummary($documentDiff)
+      #end
+  #end
+#end
+
+#macro (countEntityUnifiedDiffsChanges $entityDiffs $count)
+  #foreach ($entityDiff in $entityDiffs)
+    #set ($type = $entityDiff.type.toString().toLowerCase())
+    #set ($discard = $count.put($type, $mathtool.add($count.get($type), 1)))
+  #end
+#end
+
+#macro (displayDocumentUnifiedDiffSummary $documentDiff)
+    #diffIcon('file-white' $documentDiff.type)
+    #set ($documentReference = $documentDiff.reference)
+   $services.model.serialize($documentReference, 'local')
+      #if ("$!documentReference.locale" != '')
+        ($documentReference.locale)
+      #end
+      (#diffVersion($documentDiff.previousReference.version)
+      $services.icon.renderHTML('right')
+      #diffVersion($documentDiff.nextReference.version))
+    #if ($documentDiff.size() &gt; 0)
+      #displayDocumentPropertiesDiffSummary($documentDiff)
+    #end
+    #maybeDisplayEntityUnifiedDiffsSummary($documentDiff.attachmentDiffs 'attach'
+      'web.history.changes.summary.attachments')
+    #maybeDisplayEntityUnifiedDiffsSummary($documentDiff.objectDiffs 'cubes' 'web.history.changes.summary.objects')
+    #maybeDisplayEntityUnifiedDiffsSummary($documentDiff.classPropertyDiffs 'cube'
+      'web.history.changes.summary.classProperties')
+#end
+
+#macro (displayDocumentPropertiesDiffSummary $documentDiff)
+    $services.icon.renderHTML('file-text')
+      $services.localization.render('web.history.changes.summary.documentProperties')
+      ($services.localization.render('web.history.changes.summary.modifiedAddedRemoved', [$documentDiff.size(), 0, 0]))
+#end
+
+#macro (maybeDisplayEntityUnifiedDiffsSummary $entityDiffs $icon $label)
+  #if ($entityDiffs.size() &gt; 0)
+    * #displayEntityUnifiedDiffsSummary($entityDiffs)
+  #end
+#end
+
+#macro (displayEntityUnifiedDiffsSummary $entityDiffs $icon $label)
+    $services.icon.renderHTML($icon)
+    $services.localization.render($label)
+      #set ($count = {'change': 0, 'insert': 0, 'delete': 0})
+      #countEntityUnifiedDiffsChanges($entityDiffs $count)
+      ($services.localization.render('web.history.changes.summary.modifiedAddedRemoved',
+        [$count.change, $count.insert, $count.delete]))
+    #foreach($entityDiff in $entityDiffs)
+        #diffIcon($icon $entityDiff.type)
+        #set ($entityReference = $entityDiff.reference)
+          #if ($entityReference.type == 'OBJECT')
+            $services.model.serialize($entityReference.xClassReference, 'local')
+            [$entityReference.objectNumber]
+          #else
+            $entityReference.name
+          #end
+    #end
+#end
+
+##
+## Details
+##
+
+#macro (displayDocumentUnifiedDiffs $documentDiffs)
+  #foreach ($documentDiff in $documentDiffs)
+    #set ($documentReference = $documentDiff.reference)
+      #diffIcon('file-white' $documentDiff.type)
+        $services.model.serialize($documentReference, 'local')
+      #if ("$!documentReference.locale" != '')
+        ($documentReference.locale)
+      #end
+        #diffVersion($documentDiff.previousReference.version)
+        $services.icon.renderHTML('right')
+        #diffVersion($documentDiff.nextReference.version)
+    #displayDocumentUnifiedDiff($documentDiff)
+  #end
+#end
+
+#macro (displayDocumentUnifiedDiff $documentDiff)
+  #if ($documentDiff.size() &gt; 0)
+    #displayEntityUnifiedDiffs([$documentDiff], 'file-text')
+  #end
+  #maybeDisplayEntityUnifiedDiffs($documentDiff.attachmentDiffs 'attach')
+  #maybeDisplayEntityUnifiedDiffs($documentDiff.objectDiffs 'cubes')
+  #maybeDisplayEntityUnifiedDiffs($documentDiff.classPropertyDiffs 'cube')
+#end
+
+#macro (maybeDisplayEntityUnifiedDiffs $entityDiffs $icon)
+  #if ($entityDiffs &amp;&amp; $entityDiffs.size() &gt; 0)
+    #displayEntityUnifiedDiffs($entityDiffs $icon)
+  #end
+#end
+
+#macro (displayEntityUnifiedDiffs $entityDiffs $icon)
+    #foreach ($entityDiff in $entityDiffs)
+      #set ($entityReference = $entityDiff.reference)
+        #diffIcon($icon $entityDiff.type)
+        #if ($entityReference.type == 'DOCUMENT')
+          $services.localization.render('web.history.changes.summary.documentProperties')
+        #elseif ($entityReference.type == 'OBJECT')
+          $services.model.serialize($entityReference.xClassReference, 'local')
+          [$entityReference.objectNumber]
+        #else
+          $entityReference.name
+        #end
+      #displayEntityUnifiedDiff($entityDiff)
+    #end
+#end
+
+#macro (displayEntityUnifiedDiff $entityDiff)
+    #foreach ($entry in $entityDiff.entrySet())
+        #set ($entityType = $entityDiff.reference.type.toString().toLowerCase())
+        #if ($entityType == 'document' || $entityType == 'attachment')
+          $services.localization.render("web.history.changes.${entityType}.$entry.key")
+        #else
+          $entry.key
+        #end
+        #if ($entry.value.isEmpty())
+          #if ($entityType == 'attachment' &amp;&amp; $entry.key == 'content')
+            ## This is not a text file or the file is too large.
+            #set ($hintKey = 'web.history.changes.attachment.noContentChanges')
+          #else
+            #set ($hintKey = 'web.history.changes.privateInformation')
+          #end
+           ## $services.icon.renderHTML('info')
+        #end
+      #if ($entry.value.size() &gt; 0)
+        #displayUnifiedDiff($entry.value)
+      #end
+    #end
+#end
+
+#macro (displayUnifiedDiff $blocks)
+    #foreach ($block in $blocks)
+... ... @@ -$mathtool.add($block.previousStart, 1),$block.previousSize
+          +$mathtool.add($block.nextStart, 1),$block.nextSize @@
+      #foreach ($line in $block)
+        #set ($lineNumber = $line.index + 1)
+        #if($line.added || $line.deleted)
+$lineNumber #unifiedDiffLine($line)
+        #end
+      #end
+    #end
+#end
+#createDocumentDiff($origdoc $newdoc $docDiff)
+#createDocumentDiffSummary($docDiff $summary)
+##displayDocumentDiffSummary($summary)
+#if ($summary.entries.size() &gt; 0)
+  #displayDocumentDiff($docDiff)
+#end</content>
+</xwikidoc>
