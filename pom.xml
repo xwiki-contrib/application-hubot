@@ -28,7 +28,7 @@
   </parent>
   <groupId>org.xwiki.contrib</groupId>
   <artifactId>application-hubot-application</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <packaging>xar</packaging>
   <name>XWiki Application - Hubot Application</name>
   <description>XWiki Hubot Integration</description>
@@ -60,7 +60,7 @@
     <connection>scm:git:git://github.com/xwiki-contrib/application-hubot.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-hubot.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-hubot</url>
-    <tag>HEAD</tag>
+    <tag>application-hubot-application-1.0</tag>
   </scm>
   <distributionManagement>
     <repository>
