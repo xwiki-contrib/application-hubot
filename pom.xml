@@ -30,7 +30,7 @@
   <artifactId>application-hubot-application</artifactId>
   <version>1.1-SNAPSHOT</version>
   <packaging>xar</packaging>
-  <name>XWiki Application - Hubot Application</name>
+  <name>Hubot Application</name>
   <description>XWiki Hubot Integration</description>
   <developers>
     <developer>
