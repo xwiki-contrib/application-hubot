@@ -83,6 +83,6 @@ hubot.config.explanation=XWiki can be integrated with Hubot and through Hubot wi
 Hubot.HubotConfigClass_hubotUrl=URL of the Hubot Server
 Hubot.HubotConfigClass_hubotUsername=Username protecting the Hubot Server
 Hubot.HubotConfigClass_hubotPassword=Password protecting the Hubot Server
-Hubot.HubotConfigClass_defaultRoom=Default Room to which to send notifications
+Hubot.HubotConfigClass_defaultRoom=Default Room to which notifications are sent
 Hubot.HubotConfigClass_matrixUrl=Matrix Server URL</content>
 </xwikidoc>
